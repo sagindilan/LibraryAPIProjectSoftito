@@ -15,7 +15,7 @@ namespace LibraryAPI.Models
         public bool Gender { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime RegisterDate { get; set; }
-        public byte Status { get; set; }
+       
         [NotMapped]
         public string? Password { get; set; }
         [NotMapped]

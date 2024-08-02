@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LibraryAPI.Migrations
 {
-    public partial class Initial : Migration
+    public partial class status : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -36,7 +36,6 @@ namespace LibraryAPI.Migrations
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RegisterDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -367,10 +366,10 @@ namespace LibraryAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Condition = table.Column<bool>(type: "bit", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
                     BookId = table.Column<int>(type: "int", nullable: false),
                     LocationShelf = table.Column<string>(type: "varchar(6)", nullable: false),
                     Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     VoteCount = table.Column<int>(type: "int", nullable: false),
                     VoteSum = table.Column<int>(type: "int", nullable: false),
                     Rating = table.Column<double>(type: "float", nullable: true)

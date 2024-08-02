@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace LibraryAPI;
 
@@ -14,6 +16,10 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        //bakılacak
+        //CreateHostBuilder(args).Build().Run();
+
+
         ApplicationContext _context;
         RoleManager<IdentityRole> _roleManager;
         UserManager<ApplicationUser> _userManager;
@@ -47,6 +53,8 @@ public class Program
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
             };
         }); // BURAYA KADAR
+
+
         builder.Services.AddAuthorization(options => options.AddPolicy("Makale", policy => policy.RequireClaim("Category", "Makale")));
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -126,4 +134,48 @@ public class Program
         app.Run();
     }
 }
+
+//public static IHostBuilder CreateHostBuilder(string[] args) =>
+//       Host.CreateDefaultBuilder(args)
+//           .ConfigureWebHostDefaults(webBuilder =>
+//           {
+//               webBuilder.ConfigureServices(services =>
+//               {
+//                   services.AddDbContext<ApplicationContext>(options =>
+//                       options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+//                   services.AddIdentity<ApplicationUser, IdentityRole>()
+//                       .AddEntityFrameworkStores<ApplicationContext>()
+//                       .AddDefaultTokenProviders();
+
+//                   services.AddAuthentication(options =>
+//                   {
+//                       options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//                       options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+//                   })
+//                   .AddCookie()
+//                   .AddGoogle(options =>
+//                   {
+//                       options.ClientId = Configuration["Authentication:Google:ClientId"];
+//                       options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+//                   });
+
+//                   services.AddControllers();
+//               })
+//               .Configure(app =>
+//               {
+//                   app.UseRouting();
+
+//                   app.UseAuthentication();
+//                   app.UseAuthorization();
+
+//                   app.UseEndpoints(endpoints =>
+//                   {
+//                       endpoints.MapControllers();
+//                   });
+//               });
+//           });
+//}
+////bakılacak
+//}
 

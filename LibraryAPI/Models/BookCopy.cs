@@ -13,14 +13,12 @@ namespace LibraryAPI.Models
   
         public bool Condition { get; set; } // Kopyanın hasarlı mı değil mi kontrolü için
 
-        [Range(1,3)]
-        public int Status { get; set; } // Rafta, ödünç alındı, rezerve edildi
-
+       
         public int BookId { get; set; }
         public string LocationShelf { get; set; } = "";
         public string? Barcode { get; set; }
 
-        public int Stock { get; set; } = 1;
+        public bool IsAvailable { get; set; } = true;
 
         // Kitap kopyasına yapılan toplam oy sayısı
         public int VoteCount { get; set; }

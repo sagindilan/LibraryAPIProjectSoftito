@@ -74,17 +74,7 @@ namespace LibraryAPI.Controllers
                 return NotFound();
             }
 
-            // İade işlemi olduğunda stok ekleme
-            if (borrowingHistory.ReturnDate.HasValue && !existingBorrowingHistory.ReturnDate.HasValue)
-            {
-                var bookCopy = await _context.BookCopies.FindAsync(borrowingHistory.BookCopyId);
-                if (bookCopy != null)
-                {
-                    bookCopy.Stock++; // Stok ekleme
-                    _context.Entry(bookCopy).State = EntityState.Modified;
-                }
-            }
-
+            
             // Geç iade ve hasar cezasını hesapla
             int penaltyAmount = 0;
 
@@ -120,6 +110,15 @@ namespace LibraryAPI.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
+
+                // Kitap kopyasının durumu güncelleniyor
+                var bookCopy = await _context.BookCopies!.FindAsync(existingBorrowingHistory.BookCopyId);
+                if (bookCopy != null)
+                {
+                    bookCopy.IsAvailable = true; // Kitap iade edildiğinde tekrar rafta görünsün
+                    _context.Entry(bookCopy).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -136,82 +135,14 @@ namespace LibraryAPI.Controllers
             return NoContent();
         }
 
-        //ORHUN BAŞLADI
-
-        //[HttpPut("{id}")]
-        //public Task<IActionResult> PutBorrowing(BorrowingHistory borrowinghistory, string bookcopyid, string memberId, string employeId, BookCopy bookcopy)
-        //{
-
-        //    if (borrowinghistory != null && bookcopy != null)
-        //    {
-        //        var bookCopyIdcl = _context.BookCopies.FindAsync(bookcopyid);
-        //        var memberIdcl = _context.Members.FindAsync(memberId);
-        //        var employeIdcl = _context.Employees.FindAsync(employeId);
-        //        BorrowingHistory borrowingHistory = new BorrowingHistory
-        //        {
-        //            BorrowDate = borrowinghistory.BorrowDate,
-        //            DueDate = borrowinghistory.DueDate,
-        //            ReturnDate = borrowinghistory.ReturnDate,
-        //            PenaltyAmount = borrowinghistory.PenaltyAmount,
-        //            IsDamaged = borrowinghistory.IsDamaged,
-        //        };
-        //    }
-
-        //if (id != employee.Id)
-        //{
-        //    return BadRequest();
-        //}
-
-        //applicationUser.Address = employee.ApplicationUser!.Address;
-        //applicationUser.BirthDate = employee.ApplicationUser!.BirthDate;
-        //applicationUser.Email = employee.ApplicationUser!.Email;
-        //applicationUser.Name = employee.ApplicationUser!.Name;
-        //applicationUser.MiddleName = employee.ApplicationUser!.MiddleName;
-        //applicationUser.FamilyName = employee.ApplicationUser!.FamilyName;
-        //applicationUser.Gender = employee.ApplicationUser!.Gender;
-        //applicationUser.UserName = employee.ApplicationUser!.UserName;
-        //applicationUser.PhoneNumber = employee.ApplicationUser!.PhoneNumber;
-
-
-
-        //_userManager.UpdateAsync(applicationUser).Wait();
-        //if (currentPassword != null)
-        //{
-        //    _userManager.ChangePasswordAsync(applicationUser, currentPassword, applicationUser.Password).Wait();
-        //}
-        //employee.ApplicationUser = null;
-
-        //_context.Entry(employee).State = EntityState.Modified;
-
-        //try
-        //{
-        //    await _context.SaveChangesAsync();
-        //}
-        //catch (DbUpdateConcurrencyException)
-        //{
-        //    if (!EmployeeExists(id))
-        //    {
-        //        return NotFound();
-        //    }
-        //    else
-        //    {
-        //        throw;
-        //    }
-        //}
-
-
-
-
-        // POST: api/BorrowingHistories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "Worker")]
         [HttpPost]
-        public async Task<ActionResult<BorrowingHistory>> PostBorrowingHistory(BorrowingHistory borrowingHistory, string userName)
+        public async Task<ActionResult<BorrowingHistory>> PostBorrowingHistory([FromBody] BorrowingHistory borrowingHistory, string userName)
         {
-          if (_context.BorrowingHistories == null)
-          {
-              return Problem("Entity set 'ApplicationContext.BorrowingHistories'  is null.");
-          }
+            if (_context.BorrowingHistories == null)
+            {
+                return Problem("Entity set 'ApplicationContext.BorrowingHistories' is null.");
+            }
 
             var user = await _userManager.FindByNameAsync(userName); // Buradan Kitap Ödünç alırken MemberId yi girmek yerine username i alıp username den MemberId yi çekiyoruz.
             if (user == null)
@@ -220,22 +151,117 @@ namespace LibraryAPI.Controllers
             }
             borrowingHistory.MemberId = user.Id; // Buraya
 
-            // Kitap stok kontrolü ve düşürülmesi
+
+
+            // Kitap kopyasını al
             var bookCopy = await _context.BookCopies.FindAsync(borrowingHistory.BookCopyId);
-            if (bookCopy == null || bookCopy.Stock <= 0)
+            if (bookCopy == null)
             {
-                return BadRequest("Book is not available.");
+                return NotFound("Book copy not found.");
             }
 
-            bookCopy.Stock--; // Stoktan düşme
-            _context.Entry(bookCopy).State = EntityState.Modified;
+            // Kitap mevcut mu ve ödünç verilebilir mi kontrol et
+            if (!bookCopy.IsAvailable)
+            {
+                return BadRequest("Book copy is not available for borrowing.");
+            }
 
+            // Ödünç verme işlemini kaydet
+            borrowingHistory.BorrowDate = DateTime.Now;
+            borrowingHistory.DueDate = DateTime.Now.AddDays(14); // Ödünç verme süresi (14 gün)
 
+            // Kitap ödünç verildi, durumunu güncelle
+            bookCopy.IsAvailable = false;
+
+            // Veritabanına kaydet
             _context.BorrowingHistories.Add(borrowingHistory);
+            _context.Entry(bookCopy).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetBorrowingHistory", new { id = borrowingHistory.Id }, borrowingHistory);
         }
+
+        //[Authorize(Roles = "Worker")]
+        //[HttpPost]
+        //public async Task<ActionResult<BorrowingHistory>> PostBorrowingHistory(BorrowingHistory borrowingHistory, string userName)
+        //{
+        //    if (_context.BorrowingHistories == null)
+        //    {
+        //        return Problem("Entity set 'ApplicationContext.BorrowingHistories'  is null.");
+        //    }
+
+        //    // Kullanıcıyı al
+        //    var user = await _userManager.FindByNameAsync(userName);
+        //    if (user == null)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+        //    borrowingHistory.MemberId = user.Id;
+
+        //    // Kitap kopyasını al
+        //    var bookCopy = await _context.BookCopies.FindAsync(bookCopyId);
+        //    if (bookCopy == null)
+        //    {
+        //        return NotFound("Book copy not found.");
+        //    }
+
+        //    // Kitap mevcut mu ve ödünç verilebilir mi kontrol et
+        //    if (!bookCopy.IsAvailable)
+        //    {
+        //        return BadRequest("Book copy is not available for borrowing.");
+        //    }
+
+        //    // Ödünç verme işlemini kaydet
+        //    borrowingHistory.BookCopyId = bookCopyId;
+        //    borrowingHistory.BorrowDate = DateTime.Now;
+        //    borrowingHistory.DueDate = DateTime.Now.AddDays(14); // Ödünç verme süresi (14 gün)
+
+        //    // Kitap ödünç verildi, durumunu güncelle
+        //    bookCopy.IsAvailable = false;
+
+        //    // Veritabanına kaydet
+        //    _context.BorrowingHistories.Add(borrowingHistory);
+        //    _context.Entry(bookCopy).State = EntityState.Modified;
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetBorrowingHistory", new { id = borrowingHistory.Id }, borrowingHistory);
+        //}
+
+
+        //// POST: api/BorrowingHistories
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[Authorize(Roles = "Worker")]
+        //[HttpPost]
+        //public async Task<ActionResult<BorrowingHistory>> PostBorrowingHistory(BorrowingHistory borrowingHistory, string userName)
+        //{
+        //    if (_context.BorrowingHistories == null)
+        //    {
+        //        return Problem("Entity set 'ApplicationContext.BorrowingHistories'  is null.");
+        //    }
+
+        //    var user = await _userManager.FindByNameAsync(userName); // Buradan Kitap Ödünç alırken MemberId yi girmek yerine username i alıp username den MemberId yi çekiyoruz.
+        //    if (user == null)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+        //    borrowingHistory.MemberId = user.Id; // Buraya
+
+        //    var bookCopy = await _context.BookCopies.FindAsync(bookCopyId);
+
+        //    if (bookCopy == null)
+        //    {
+        //        return NotFound("Book copy not found.");
+        //    }
+
+        //    // Kitap mevcut mu ve rafta mı kontrol et
+        //    if (!bookCopy.Condition)
+        //    {
+        //        return BadRequest("Book copy is not available for borrowing.");
+        //    }
+
+
+        //    return CreatedAtAction("GetBorrowingHistory", new { id = borrowingHistory.Id }, borrowingHistory);
+        //}
 
         // DELETE: api/BorrowingHistories/5
         [Authorize(Roles = "Worker")]
