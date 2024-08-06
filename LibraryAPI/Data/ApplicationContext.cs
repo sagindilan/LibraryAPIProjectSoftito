@@ -22,13 +22,10 @@ namespace LibraryAPI.Data
         public DbSet<AuthorBook>? AuthorBook { get; set; }
         public DbSet<Member>? Members { get; set; }
         public DbSet<Employee>? Employees { get; set; }
-        public DbSet<PurchasedBook>? PurchasedBooks { get; set; }
         public DbSet<BookCopy>? BookCopies { get; set; }
         public DbSet<Department>? Departments { get; set; }
         public DbSet<BookLanguage>? BookLanguage{ get; set; }
         public DbSet<BookSubCategory>? BookSubCategory { get; set; }
-        public DbSet<DonatedBook>? DonatedBooks { get; set; }
-        public DbSet<Reservation>? Reservations { get; set; }
         public DbSet<Rating>? Ratings { get; set; }
         public DbSet<Loan>? Loans { get; set; }
 
@@ -44,14 +41,7 @@ namespace LibraryAPI.Data
             modelBuilder.Entity<BookLanguage>().HasKey(a => new { a.BookId, a.LanguageId });
 
 
-            
-
-            modelBuilder.Entity<PurchasedBook>()
-               .HasOne(k => k.Publisher)
-               .WithMany(n => n.PurchasedBook)
-               .HasForeignKey(k => k.PublisherId)
-               .OnDelete(DeleteBehavior.Restrict);
-
+           
             modelBuilder.Entity<Loan>()
               .HasOne(l => l.Member)
               .WithMany(m => m.Loans)

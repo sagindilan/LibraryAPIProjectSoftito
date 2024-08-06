@@ -29,7 +29,6 @@ namespace LibraryAPI.Models
         [JsonIgnore]
         public List<Book>? Books { get; set; }
 
-        public List<PurchasedBook>? PurchasedBook { get; set; }
 
     }
 }

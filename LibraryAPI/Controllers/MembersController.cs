@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryAPI.Data;
 using LibraryAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Google.Apis.Auth;
 
 namespace LibraryAPI.Controllers
 {
@@ -19,12 +15,14 @@ namespace LibraryAPI.Controllers
         private readonly ApplicationContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IConfiguration _configuration;
 
-        public MembersController(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public MembersController(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
+            _configuration = configuration;
         }
 
         // GET: api/Members
@@ -57,6 +55,7 @@ namespace LibraryAPI.Controllers
 
             return member;
         }
+
 
         // PUT: api/Members/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -211,10 +210,56 @@ namespace LibraryAPI.Controllers
 
             return Ok();
         }
+        private async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(GoogleAuthModel googleAuthModel)
+        {
+            try
+            {
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string>() { _configuration["Authentication:Google:ClientId"] }
+                };
+                var payload = await GoogleJsonWebSignature.ValidateAsync(googleAuthModel.idToken, settings);
+                return payload;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error validating Google token: {ex.Message}");
+                return null;
+            }
+        }
 
 
 
 
+        [HttpPost("GoogleRegister")]
+        public async Task<IActionResult> GoogleRegister([FromBody] GoogleAuthModel googleAuthModel)
+        {
+            var payload = await VerifyGoogleToken(googleAuthModel);
+            if (payload == null)
+            {
+                return BadRequest("Invalid Google token.");
+            }
+
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user != null)
+            {
+                return BadRequest("User already exists.");
+            }
+
+            user = new ApplicationUser
+            {
+                Email = payload.Email,
+                UserName = payload.Email
+            };
+
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest("User registration failed.");
+            }
+
+            return Ok("User registered successfully.");
+        }
 
         private bool MemberExists(string id)
         {
