@@ -27,10 +27,10 @@ namespace LibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations()
         {
-          if (_context.Reservations == null)
-          {
-              return NotFound();
-          }
+            if (_context.Reservations == null)
+            {
+                return NotFound();
+            }
             return await _context.Reservations.ToListAsync();
         }
 
@@ -39,10 +39,10 @@ namespace LibraryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Reservation>> GetReservation(int id)
         {
-          if (_context.Reservations == null)
-          {
-              return NotFound();
-          }
+            if (_context.Reservations == null)
+            {
+                return NotFound();
+            }
             var reservation = await _context.Reservations.FindAsync(id);
 
             if (reservation == null)
@@ -91,10 +91,10 @@ namespace LibraryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservation>> PostReservation(Reservation reservation)
         {
-          if (_context.Reservations == null)
-          {
-              return Problem("Entity set 'ApplicationContext.Reservations'  is null.");
-          }
+            if (_context.Reservations == null)
+            {
+                return Problem("Entity set 'ApplicationContext.Reservations'  is null.");
+            }
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 

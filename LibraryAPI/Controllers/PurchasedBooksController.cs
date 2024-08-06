@@ -27,10 +27,10 @@ namespace LibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PurchasedBook>>> GetPurchasedBooks()
         {
-          if (_context.PurchasedBooks == null)
-          {
-              return NotFound();
-          }
+            if (_context.PurchasedBooks == null)
+            {
+                return NotFound();
+            }
             return await _context.PurchasedBooks.ToListAsync();
         }
 
@@ -39,10 +39,10 @@ namespace LibraryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PurchasedBook>> GetPurchasedBook(int id)
         {
-          if (_context.PurchasedBooks == null)
-          {
-              return NotFound();
-          }
+            if (_context.PurchasedBooks == null)
+            {
+                return NotFound();
+            }
             var purchasedBook = await _context.PurchasedBooks.FindAsync(id);
 
             if (purchasedBook == null)
@@ -91,10 +91,10 @@ namespace LibraryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<PurchasedBook>> PostPurchasedBook(PurchasedBook purchasedBook)
         {
-          if (_context.PurchasedBooks == null)
-          {
-              return Problem("Entity set 'ApplicationContext.PurchasedBooks'  is null.");
-          }
+            if (_context.PurchasedBooks == null)
+            {
+                return Problem("Entity set 'ApplicationContext.PurchasedBooks'  is null.");
+            }
             _context.PurchasedBooks.Add(purchasedBook);
             await _context.SaveChangesAsync();
 

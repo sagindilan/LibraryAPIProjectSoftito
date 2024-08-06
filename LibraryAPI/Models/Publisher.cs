@@ -5,16 +5,16 @@ using System.Text.Json.Serialization;
 
 namespace LibraryAPI.Models
 {
-	public class Publisher
-	{
+    public class Publisher
+    {
         public int Id { get; set; }
 
         [Required]
         [StringLength(800)]
         public string Name { get; set; } = "";
-        
+
         [Phone]
-        [StringLength(15,MinimumLength = 7)]
+        [StringLength(15, MinimumLength = 7)]
         [Column(TypeName = "varchar(15)")]
         public string? Phone { get; set; }
 

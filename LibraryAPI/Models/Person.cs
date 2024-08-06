@@ -34,6 +34,9 @@ namespace LibraryAPI.Models
         public byte EducationalDegree { get; set; }
 
         public List<BorrowingHistory>? BorrowingHistories { get; set; }
+
+        public List<Loan>? Loans { get; set; }
+
         public List<Rating>? Ratings { get; set; }
         public int TotalPenalty { get; set; } = 0;
 

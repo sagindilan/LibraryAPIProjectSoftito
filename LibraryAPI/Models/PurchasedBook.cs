@@ -4,8 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace LibraryAPI.Models
 {
-	public class PurchasedBook
-	{
+    public class PurchasedBook
+    {
         public int Id { get; set; }
 
         public DateTime PurchaseDate { get; set; }

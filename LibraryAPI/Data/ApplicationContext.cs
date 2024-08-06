@@ -31,9 +31,7 @@ namespace LibraryAPI.Data
         public DbSet<DonatedBook>? DonatedBooks { get; set; }
         public DbSet<Reservation>? Reservations { get; set; }
         public DbSet<Rating>? Ratings { get; set; }
-
-
-
+        public DbSet<Loan>? Loans { get; set; }
 
 
 
@@ -59,30 +57,16 @@ namespace LibraryAPI.Data
                .HasForeignKey(k => k.PublisherId)
                .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<AuthorBook>()
-            //.HasOne(ab => ab.Author)
-            //.WithMany(a => a.AuthorBooks)
-            //.HasForeignKey(ab => ab.AuthorsId);
+            modelBuilder.Entity<Loan>()
+              .HasOne(l => l.Member)
+              .WithMany(m => m.Loans)
+              .HasForeignKey(l => l.MemberId)
+              .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<AuthorBook>()
-            //.HasOne(ab => ab.Book)
-            //.WithMany(b => b.AuthorBooks)
-            //.HasForeignKey(ab => ab.BooksId);
         }
-
-
-
-
-
 
         public DbSet<LibraryAPI.Models.Rating>? Rating { get; set; }
 
-
-
-
-
-
-       
     }
 }
 

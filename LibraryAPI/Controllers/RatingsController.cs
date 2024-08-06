@@ -27,10 +27,10 @@ namespace LibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rating>>> GetRating()
         {
-          if (_context.Rating == null)
-          {
-              return NotFound();
-          }
+            if (_context.Rating == null)
+            {
+                return NotFound();
+            }
             return await _context.Rating.ToListAsync();
         }
 
@@ -39,10 +39,10 @@ namespace LibraryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Rating>> GetRating(int id)
         {
-          if (_context.Rating == null)
-          {
-              return NotFound();
-          }
+            if (_context.Rating == null)
+            {
+                return NotFound();
+            }
             var rating = await _context.Rating.FindAsync(id);
 
             if (rating == null)
@@ -101,8 +101,11 @@ namespace LibraryAPI.Controllers
                 return BadRequest("Puan 1 ile 5 arasında olmalıdır.");
             }
 
-            var borrowingHistories = _context.BorrowingHistories!.FirstOrDefault(l => l.BookCopyId == rating.BookCopyId && l.MemberId == rating.MemberId && l.ReturnDate != null);
-            if (borrowingHistories == null)
+            var loans = _context.Loans!.FirstOrDefault(l => l.BookCopyId == rating.BookCopyId && l.MemberId == rating.MemberId && l.ReturnDate != null);
+            if (loans == null)
+
+                //BURADA BORROWING YERİNE KULLANMAK GEREKİYOR MU LOAN İÇİN YOKSA SİLMEK Mİ GEREKİR NE YAPMAK İSTİYORDUN POSTRATING NEDİR
+                //BİRE BİR AYNIYSA BUNU DEĞİŞTİRELİM LOAN OLARAK İSTERSEN İÇERİK AYNI AMAÇ AYNI İSE anl
             {
                 return BadRequest("Bu kitabı ödünç alıp iade etmediniz.");
             }

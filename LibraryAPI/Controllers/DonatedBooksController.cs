@@ -27,10 +27,10 @@ namespace LibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DonatedBook>>> GetDonatedBooks()
         {
-          if (_context.DonatedBooks == null)
-          {
-              return NotFound();
-          }
+            if (_context.DonatedBooks == null)
+            {
+                return NotFound();
+            }
             return await _context.DonatedBooks.ToListAsync();
         }
 
@@ -39,10 +39,10 @@ namespace LibraryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DonatedBook>> GetDonatedBook(int id)
         {
-          if (_context.DonatedBooks == null)
-          {
-              return NotFound();
-          }
+            if (_context.DonatedBooks == null)
+            {
+                return NotFound();
+            }
             var donatedBook = await _context.DonatedBooks.FindAsync(id);
 
             if (donatedBook == null)
@@ -91,10 +91,10 @@ namespace LibraryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<DonatedBook>> PostDonatedBook(DonatedBook donatedBook)
         {
-          if (_context.DonatedBooks == null)
-          {
-              return Problem("Entity set 'ApplicationContext.DonatedBooks'  is null.");
-          }
+            if (_context.DonatedBooks == null)
+            {
+                return Problem("Entity set 'ApplicationContext.DonatedBooks'  is null.");
+            }
             _context.DonatedBooks.Add(donatedBook);
             await _context.SaveChangesAsync();
 

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace LibraryAPI.Models
 {
-    public class BorrowingHistory
+    public class Loan
     {
         public const int PenaltyPerDay = 5; // Günlük ceza tutarı
         public const int DamagePenalty = 50; // Hasar cezası
@@ -18,7 +18,7 @@ namespace LibraryAPI.Models
         public DateTime? ReturnDate { get; set; }
         public int PenaltyAmount { get; set; } = 0;
         public bool IsDamaged { get; set; }
-
+        //içerik aynı değil mi
 
         [JsonIgnore]
         [ForeignKey(nameof(BookCopyId))]
@@ -34,3 +34,4 @@ namespace LibraryAPI.Models
 
     }
 }
+

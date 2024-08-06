@@ -6,14 +6,14 @@ using System.Text.Json.Serialization;
 
 namespace LibraryAPI.Models
 {
-	public class BookCopy
-	{
+    public class BookCopy
+    {
         public int Id { get; set; }
 
-  
+
         public bool Condition { get; set; } // Kopyanın hasarlı mı değil mi kontrolü için
 
-       
+
         public int BookId { get; set; }
         public string LocationShelf { get; set; } = "";
         public string? Barcode { get; set; }
@@ -35,7 +35,7 @@ namespace LibraryAPI.Models
         public Book? Book { get; set; }
 
         [JsonIgnore]
-        public List<BorrowingHistory>? BorrowingHistory { get; set; }
+        public List<Loan>? Loan { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(LocationShelf))]

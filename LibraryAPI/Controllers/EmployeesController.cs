@@ -26,7 +26,7 @@ namespace LibraryAPI.Controllers
         private readonly IConfiguration _configuration; // appsetting.json a erişim sağlamak için.
 
 
-        public EmployeesController(ApplicationContext context,UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager,IConfiguration configuration)
+        public EmployeesController(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
@@ -40,10 +40,10 @@ namespace LibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
             return await _context.Employees.ToListAsync();
         }
 
@@ -52,10 +52,10 @@ namespace LibraryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(string id)
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
             var employee = await _context.Employees.FindAsync(id);
 
             if (employee == null)
@@ -70,7 +70,7 @@ namespace LibraryAPI.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(string id, Employee employee,string? currentPassword=null)
+        public async Task<IActionResult> PutEmployee(string id, Employee employee, string? currentPassword = null)
         {
             ApplicationUser applicationUser = _userManager.FindByIdAsync(id).Result;
 
@@ -127,11 +127,11 @@ namespace LibraryAPI.Controllers
         {
             //Claim claim;
 
-          if (_context.Employees == null)
-          {
-              return Problem("Entity set 'ApplicationContext.Employees'  is null.");
-          }
-            _userManager.CreateAsync(employee.ApplicationUser!,employee.ApplicationUser!.Password).Wait();
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'ApplicationContext.Employees'  is null.");
+            }
+            _userManager.CreateAsync(employee.ApplicationUser!, employee.ApplicationUser!.Password).Wait();
             _userManager.AddToRoleAsync(employee.ApplicationUser, "Worker").Wait();
             //if(category!=null)
             //    {
@@ -194,9 +194,9 @@ namespace LibraryAPI.Controllers
             ApplicationUser applicationUser = _userManager.FindByNameAsync(userName).Result;
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
 
-            if(applicationUser!=null)
+            if (applicationUser != null)
             {
-                if (_userManager.CheckPasswordAsync(applicationUser, password).Result == true) 
+                if (_userManager.CheckPasswordAsync(applicationUser, password).Result == true)
                 {
                     var userRoles = _userManager.GetRolesAsync(applicationUser).Result;
 
@@ -211,12 +211,12 @@ namespace LibraryAPI.Controllers
                         authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                     }
 
-                    var userClaims = _userManager.GetClaimsAsync(applicationUser).Result; 
+                    var userClaims = _userManager.GetClaimsAsync(applicationUser).Result;
 
                     authClaims.AddRange(userClaims); // Kullanıcıya ait Claim var ise eklemesi için.
 
                     var authSigninKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-                   
+
                     var token = new JwtSecurityToken(
                         issuer: _configuration["JWT:ValidIssuer"],
                         audience: _configuration["JWT:ValidAudience"],
@@ -236,7 +236,7 @@ namespace LibraryAPI.Controllers
                 //signInResult = _signInManager.PasswordSignInAsync(applicationUser, password, false, false).Result;
                 //if (signInResult.Succeeded == true)
                 //{
-                    //return Ok();
+                //return Ok();
                 //}
             }
             return Unauthorized();
@@ -255,14 +255,14 @@ namespace LibraryAPI.Controllers
         {
             ApplicationUser applicationUser = _userManager.FindByNameAsync(userName).Result;
 
-            string token= _userManager.GeneratePasswordResetTokenAsync(applicationUser).Result;
+            string token = _userManager.GeneratePasswordResetTokenAsync(applicationUser).Result;
             System.Net.Mail.MailMessage mailMessage = new System.Net.Mail.MailMessage("abc@abc", applicationUser.Email, "Şifre sıfırlama", token);
             System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient("http://smtp.domain.com");
             smtpClient.Send(mailMessage);
             return token;
         }
         [HttpPost("ResetPassword")]
-        public ActionResult ResetPassword(string userName,string token,string newPassword)
+        public ActionResult ResetPassword(string userName, string token, string newPassword)
         {
             ApplicationUser applicationUser = _userManager.FindByNameAsync(userName).Result;
 

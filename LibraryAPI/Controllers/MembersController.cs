@@ -32,10 +32,10 @@ namespace LibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Member>>> GetMembers()
         {
-          if (_context.Members == null)
-          {
-              return NotFound();
-          }
+            if (_context.Members == null)
+            {
+                return NotFound();
+            }
             return await _context.Members.ToListAsync();
         }
 
@@ -44,10 +44,10 @@ namespace LibraryAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Member>> GetMember(string id)
         {
-          if (_context.Members == null)
-          {
-              return NotFound();
-          }
+            if (_context.Members == null)
+            {
+                return NotFound();
+            }
             var member = await _context.Members.FindAsync(id);
 
             if (member == null)
@@ -62,7 +62,7 @@ namespace LibraryAPI.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMember(string id, Member member,string? currentPassword = null)
+        public async Task<IActionResult> PutMember(string id, Member member, string? currentPassword = null)
         {
             ApplicationUser applicationUser = _userManager.FindByIdAsync(id).Result;
 
@@ -90,7 +90,7 @@ namespace LibraryAPI.Controllers
             member.ApplicationUser = null;
 
             _context.Entry(member).State = EntityState.Modified;
-           
+
 
             try
             {
@@ -116,10 +116,10 @@ namespace LibraryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Member>> PostMember(Member member)
         {
-          if (_context.Members == null)
-          {
-              return Problem("Entity set 'ApplicationContext.Members'  is null.");
-          }
+            if (_context.Members == null)
+            {
+                return Problem("Entity set 'ApplicationContext.Members'  is null.");
+            }
             _userManager.CreateAsync(member.ApplicationUser!, member.ApplicationUser!.Password).Wait();
             _userManager.AddToRoleAsync(member.ApplicationUser, "Member").Wait();
 
