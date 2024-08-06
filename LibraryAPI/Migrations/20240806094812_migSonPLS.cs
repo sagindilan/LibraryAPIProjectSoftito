@@ -5,12 +5,41 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LibraryAPI.Migrations
 {
-    public partial class sonhali06082024 : Migration
+    public partial class migSonPLS : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+
+
             migrationBuilder.CreateTable(
-                name: "BorrowingHistories",
+                name: "DonatedBooks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookCopyId = table.Column<int>(type: "int", nullable: false),
+                    MemberId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DonationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DonatedBooks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DonatedBooks_BookCopies_BookCopyId",
+                        column: x => x.BookCopyId,
+                        principalTable: "BookCopies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DonatedBooks_Members_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Members",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Loans",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -26,21 +55,21 @@ namespace LibraryAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BorrowingHistories", x => x.Id);
+                    table.PrimaryKey("PK_Loans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BorrowingHistories_BookCopies_BookCopyId",
+                        name: "FK_Loans_BookCopies_BookCopyId",
                         column: x => x.BookCopyId,
                         principalTable: "BookCopies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BorrowingHistories_Employees_EmployeeId",
+                        name: "FK_Loans_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BorrowingHistories_Members_MemberId",
+                        name: "FK_Loans_Members_MemberId",
                         column: x => x.MemberId,
                         principalTable: "Members",
                         principalColumn: "Id",
@@ -110,57 +139,9 @@ namespace LibraryAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_BorrowingHistories_BookCopyId",
-                table: "BorrowingHistories",
-                column: "BookCopyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BorrowingHistories_EmployeeId",
-                table: "BorrowingHistories",
-                column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BorrowingHistories_MemberId",
-                table: "BorrowingHistories",
-                column: "MemberId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchasedBooks_BookCopyId",
-                table: "PurchasedBooks",
-                column: "BookCopyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchasedBooks_EmployeeId",
-                table: "PurchasedBooks",
-                column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchasedBooks_PublisherId",
-                table: "PurchasedBooks",
-                column: "PublisherId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservations_BookCopyId",
-                table: "Reservations",
-                column: "BookCopyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservations_MemberId",
-                table: "Reservations",
-                column: "MemberId");
         }
-
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "BorrowingHistories");
-
-            migrationBuilder.DropTable(
-                name: "PurchasedBooks");
-
-            migrationBuilder.DropTable(
-                name: "Reservations");
         }
     }
 }

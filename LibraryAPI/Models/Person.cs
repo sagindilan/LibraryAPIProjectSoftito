@@ -33,7 +33,6 @@ namespace LibraryAPI.Models
 
         public byte EducationalDegree { get; set; }
 
-        public List<BorrowingHistory>? BorrowingHistories { get; set; }
 
         public List<Loan>? Loans { get; set; }
 
@@ -57,9 +56,7 @@ namespace LibraryAPI.Models
 
         [ForeignKey(nameof(DepartmentId))]
         public Department? Department { get; set; }
-        public List<BorrowingHistory>? BorrowingHistories { get; set; }
-
-
+        public List<Loan>? Loans { get; set; }
 
     }
 }

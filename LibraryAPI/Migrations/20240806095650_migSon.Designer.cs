@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryAPI.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240806090212_sonhali06082024")]
-    partial class sonhali06082024
+    [Migration("20240806095650_migSon")]
+    partial class migSon
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -270,51 +270,6 @@ namespace LibraryAPI.Migrations
                     b.HasIndex("SubCategoryId");
 
                     b.ToTable("BookSubCategory");
-                });
-
-            modelBuilder.Entity("LibraryAPI.Models.BorrowingHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("BookCopyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("BorrowDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EmployeeId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDamaged")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MemberId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("PenaltyAmount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ReturnDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookCopyId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("MemberId");
-
-                    b.ToTable("BorrowingHistories");
                 });
 
             modelBuilder.Entity("LibraryAPI.Models.Category", b =>
@@ -858,33 +813,6 @@ namespace LibraryAPI.Migrations
                     b.Navigation("SubCategory");
                 });
 
-            modelBuilder.Entity("LibraryAPI.Models.BorrowingHistory", b =>
-                {
-                    b.HasOne("LibraryAPI.Models.BookCopy", "BookCopy")
-                        .WithMany("BorrowingHistory")
-                        .HasForeignKey("BookCopyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LibraryAPI.Models.Employee", "Employee")
-                        .WithMany("BorrowingHistories")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LibraryAPI.Models.Member", "Member")
-                        .WithMany("BorrowingHistories")
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("BookCopy");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Member");
-                });
-
             modelBuilder.Entity("LibraryAPI.Models.DonatedBook", b =>
                 {
                     b.HasOne("LibraryAPI.Models.BookCopy", "BookCopy")
@@ -926,13 +854,13 @@ namespace LibraryAPI.Migrations
             modelBuilder.Entity("LibraryAPI.Models.Loan", b =>
                 {
                     b.HasOne("LibraryAPI.Models.BookCopy", "BookCopy")
-                        .WithMany()
+                        .WithMany("Loan")
                         .HasForeignKey("BookCopyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LibraryAPI.Models.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("Loans")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1104,7 +1032,7 @@ namespace LibraryAPI.Migrations
 
             modelBuilder.Entity("LibraryAPI.Models.BookCopy", b =>
                 {
-                    b.Navigation("BorrowingHistory");
+                    b.Navigation("Loan");
 
                     b.Navigation("Ratings");
                 });
@@ -1121,7 +1049,7 @@ namespace LibraryAPI.Migrations
 
             modelBuilder.Entity("LibraryAPI.Models.Employee", b =>
                 {
-                    b.Navigation("BorrowingHistories");
+                    b.Navigation("Loans");
                 });
 
             modelBuilder.Entity("LibraryAPI.Models.Language", b =>
@@ -1136,8 +1064,6 @@ namespace LibraryAPI.Migrations
 
             modelBuilder.Entity("LibraryAPI.Models.Member", b =>
                 {
-                    b.Navigation("BorrowingHistories");
-
                     b.Navigation("Loans");
 
                     b.Navigation("Ratings");
